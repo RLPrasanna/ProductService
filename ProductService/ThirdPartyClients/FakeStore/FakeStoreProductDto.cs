@@ -1,4 +1,4 @@
-﻿namespace ProductService.DTOs
+﻿namespace ProductService.ThirdPartyClients.FakeStore
 {
     public class FakeStoreProductDto
     {
