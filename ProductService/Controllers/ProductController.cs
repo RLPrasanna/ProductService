@@ -42,8 +42,6 @@ namespace ProductService.Controllers
                 var exceptionDto = new ExceptionDto(HttpStatusCode.NotFound, ex.Message);
                 return NotFound(exceptionDto);
             }
-
-
         }
 
 

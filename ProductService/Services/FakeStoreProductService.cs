@@ -4,40 +4,23 @@ using ProductService.DTOs;
 using Newtonsoft.Json;
 using ProductService.Exceptions;
 using ProductService.Models;
+using ProductService.ThirdPartyClients.FakeStore;
 
 namespace ProductService.Services
 {
     public class FakeStoreProductService:IProductService
     {
-        private string requestUrl = "https://fakestoreapi.com/";
-        private HttpClient httpClient;
-        public FakeStoreProductService(HttpClient httpClient)
-        {
-            this.httpClient = httpClient;
-        }
-        public async Task<GenericProductDto> getProductById(long id)
-        {
-            httpClient.BaseAddress=new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.GetAsync($"products/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                string content=await response.Content.ReadAsStringAsync();
-                FakeStoreProductDto fakeStoreProduct= JsonConvert.DeserializeObject<FakeStoreProductDto>(content);
-                if (fakeStoreProduct == null)
-                {
-                    throw new NotFoundException("Product with id: " + id + " doesn't exist.");
-                }
-                var product = MapToGenericProductDto(fakeStoreProduct);
-                return product;
-            }
-            return null;
-        }
+        private FakeStoryProductServiceClient fakeStoryProductServiceClient;
 
+        public FakeStoreProductService(FakeStoryProductServiceClient fakeStoryProductServiceClient)
+        {
+            this.fakeStoryProductServiceClient = fakeStoryProductServiceClient;
+        }
         private GenericProductDto MapToGenericProductDto(FakeStoreProductDto? fakeStoreProduct)
         {
             return new GenericProductDto()
             {
-                id=fakeStoreProduct.id,
+                id = fakeStoreProduct.id,
                 title = fakeStoreProduct.title,
                 price = fakeStoreProduct.price,
                 description = fakeStoreProduct.description,
@@ -46,49 +29,32 @@ namespace ProductService.Services
             };
         }
 
+        public async Task<GenericProductDto> getProductById(long id)
+        {
+            var fakeStoreProduct = await fakeStoryProductServiceClient.getProductById(id);
+            var product = MapToGenericProductDto(fakeStoreProduct);
+            return product;
+        }
+
         public async Task<GenericProductDto> createProduct(GenericProductDto product)
         {
-            httpClient.BaseAddress=new Uri(requestUrl);
-            string jsonContent = JsonConvert.SerializeObject(product);
-            HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync("products",httpContent);
-            string content=await response.Content.ReadAsStringAsync();
-            GenericProductDto createdProduct = JsonConvert.DeserializeObject<GenericProductDto>(content);
-            return createdProduct;
+            return MapToGenericProductDto(await fakeStoryProductServiceClient.createProduct(product));
         }
 
         public async Task<List<GenericProductDto>> getAllProducts()
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.GetAsync("products");
-            if (response.IsSuccessStatusCode)
+            List<GenericProductDto> genericProductDtos = new List<GenericProductDto>();
+            var fakeStoreProduct =await fakeStoryProductServiceClient.getAllProducts();
+            foreach (FakeStoreProductDto fakeStoreProductDto in fakeStoreProduct)
             {
-                string content = await response.Content.ReadAsStringAsync();
-                List<FakeStoreProductDto> fakeStoreProduct = JsonConvert.DeserializeObject<List<FakeStoreProductDto>>(content);
-                List<GenericProductDto> products = new List<GenericProductDto>();
-                foreach(FakeStoreProductDto fakeStoreProductDto in fakeStoreProduct)
-                {
-                    products.Add(MapToGenericProductDto(fakeStoreProductDto));
-                }
-
-                return products;
+                genericProductDtos.Add(MapToGenericProductDto(fakeStoreProductDto));
             }
-
-            return null;
+            return genericProductDtos;
         }
 
         public async Task<GenericProductDto> deleteProduct(long id)
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.DeleteAsync($"products/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                string content=await response.Content.ReadAsStringAsync();
-                FakeStoreProductDto deletedProduct = JsonConvert.DeserializeObject<FakeStoreProductDto>(content);
-
-                return MapToGenericProductDto(deletedProduct);
-            }
-            return new GenericProductDto();
+            return MapToGenericProductDto(await fakeStoryProductServiceClient.deleteProduct(id));
         }
 
     }

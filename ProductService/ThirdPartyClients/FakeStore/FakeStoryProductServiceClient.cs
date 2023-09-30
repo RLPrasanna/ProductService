@@ -2,21 +2,33 @@
 using ProductService.DTOs;
 using ProductService.Exceptions;
 using System.Text;
-
+using Microsoft.Extensions;
 namespace ProductService.ThirdPartyClients.FakeStore
 {
     public class FakeStoryProductServiceClient
     {
-        private string requestUrl = "https://fakestoreapi.com/";
+        private string fakeStoreApiUrl;
+        private string fakeStoreProductsApiPath;
+
+        private string _productRequestsBaseUrl;
+
         private HttpClient httpClient;
-        public FakeStoryProductServiceClient(HttpClient httpClient)
+        private IConfiguration _configuration;
+        public FakeStoryProductServiceClient(HttpClient httpClient,IConfiguration configuration)
         {
             this.httpClient = httpClient;
+            _configuration = configuration;
+            fakeStoreApiUrl = _configuration["AppSettings:fakeStoreApiUrl"];
+            fakeStoreProductsApiPath = _configuration["AppSettings:fakeStoreApiProductPath"];
+
+            //BaseAddress is not needed anymore as we are passing the full url in the URI section
+            //httpClient.BaseAddress = new Uri(fakeStoreApiUrl);
+            // Initialize other fieldss
+            this._productRequestsBaseUrl = fakeStoreApiUrl + fakeStoreProductsApiPath;
         }
         public async Task<FakeStoreProductDto> getProductById(long id)
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.GetAsync($"products/{id}");
+            HttpResponseMessage response = await httpClient.GetAsync($"{_productRequestsBaseUrl}/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -32,19 +44,18 @@ namespace ProductService.ThirdPartyClients.FakeStore
 
         public async Task<FakeStoreProductDto> createProduct(GenericProductDto product)
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
+            
             string jsonContent = JsonConvert.SerializeObject(product);
             HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await httpClient.PostAsync("products", httpContent);
+            HttpResponseMessage response = await httpClient.PostAsync(_productRequestsBaseUrl, httpContent);
             string content = await response.Content.ReadAsStringAsync();
-            GenericProductDto createdProduct = JsonConvert.DeserializeObject<GenericProductDto>(content);
+            FakeStoreProductDto createdProduct = JsonConvert.DeserializeObject<FakeStoreProductDto>(content);
             return createdProduct;
         }
 
         public async Task<List<FakeStoreProductDto>> getAllProducts()
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.GetAsync("products");
+            HttpResponseMessage response = await httpClient.GetAsync(_productRequestsBaseUrl);
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -56,8 +67,7 @@ namespace ProductService.ThirdPartyClients.FakeStore
 
         public async Task<FakeStoreProductDto> deleteProduct(long id)
         {
-            httpClient.BaseAddress = new Uri(requestUrl);
-            HttpResponseMessage response = await httpClient.DeleteAsync($"products/{id}");
+            HttpResponseMessage response = await httpClient.DeleteAsync($"{_productRequestsBaseUrl}/{id}");
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();

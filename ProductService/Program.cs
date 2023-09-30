@@ -1,5 +1,6 @@
 using ProductService.Exceptions;
 using ProductService.Services;
+using ProductService.ThirdPartyClients.FakeStore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IProductService, ProductService.Services.FakeStoreProductService>();
+builder.Services.AddScoped<IProductService, FakeStoreProductService>();
 builder.Services.AddTransient<ProductService.Services.ProductService>();
+builder.Services.AddTransient<FakeStoryProductServiceClient>();
 
 var app = builder.Build();
 
