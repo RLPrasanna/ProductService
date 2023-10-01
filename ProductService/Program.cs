@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using ProductService;
 using ProductService.Exceptions;
 using ProductService.Services;
 using ProductService.ThirdPartyClients.FakeStore;
@@ -14,6 +16,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IProductService, FakeStoreProductService>();
 builder.Services.AddTransient<ProductService.Services.ProductService>();
 builder.Services.AddTransient<FakeStoryProductServiceClient>();
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 
 var app = builder.Build();
 

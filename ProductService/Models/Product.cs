@@ -6,6 +6,6 @@
         public string description { get; set; }
         public string image { get; set; }
         public double price { get; set; }
-        private Category category;
+        public Category category { get; set; }
     }
 }
