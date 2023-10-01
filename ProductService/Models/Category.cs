@@ -2,6 +2,6 @@
 {
     public class Category:BaseModel
     {
-        private string name;
+        public string name { get; set; }
     }
 }
