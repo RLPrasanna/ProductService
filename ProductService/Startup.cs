@@ -1,4 +1,6 @@
-﻿namespace ProductService
+﻿using ProductService.InheritanceDemo.TablePerHierarchy;
+
+namespace ProductService
 {
     public class Startup
     {
@@ -21,5 +23,6 @@
             // Your configuration is available here.
             var apiKey = config["AppSettings:ApiKey"];
         }
+
     }
 }

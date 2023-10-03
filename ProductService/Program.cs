@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ProductService;
 using ProductService.Exceptions;
+using ProductService.InheritanceDemo;
+using ProductService.InheritanceDemo.TablePerHierarchy;
 using ProductService.Services;
 using ProductService.ThirdPartyClients.FakeStore;
 
@@ -16,6 +18,9 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IProductService, FakeStoreProductService>();
 builder.Services.AddTransient<ProductService.Services.ProductService>();
 builder.Services.AddTransient<FakeStoryProductServiceClient>();
+
+builder.Services.AddScoped<MentorRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -37,5 +42,11 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var repositoryTest = new RepositoryTest(scope.ServiceProvider);
+    repositoryTest.RunRepositoryTests();
+}
 
 app.Run();
