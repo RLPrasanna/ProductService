@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace ProductService.InheritanceDemo.TablePerHierarchy
+namespace ProductService.InheritanceDemo.TablePerType
 {
     public class MentorRepository
     {
@@ -13,7 +13,7 @@ namespace ProductService.InheritanceDemo.TablePerHierarchy
 
         public void Add(Mentor mentor)
         {
-            _context.TPHUsers.Add(mentor);
+            _context.TPTMentors.Add(mentor);
             _context.SaveChanges();
         }
     }

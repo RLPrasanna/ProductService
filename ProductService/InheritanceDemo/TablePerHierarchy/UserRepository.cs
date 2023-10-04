@@ -11,7 +11,7 @@
 
         public void Add(User user)
         {
-            _context.Users.Add(user);
+            _context.TPHUsers.Add(user);
             _context.SaveChanges();
         }
     }

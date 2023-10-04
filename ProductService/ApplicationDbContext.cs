@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProductService.InheritanceDemo.TablePerHierarchy;
+using ProductService.InheritanceDemo.ComplexType;
 using ProductService.Models;
 
 namespace ProductService
@@ -8,7 +8,20 @@ namespace ProductService
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<InheritanceDemo.TablePerHierarchy.User> TPHUsers { get; set; }
+        public DbSet<InheritanceDemo.TablePerConcreteType.Mentor> TPCMentors { get; set; }
+        public DbSet<InheritanceDemo.TablePerConcreteType.Student> TPCStudents { get; set; }
+        public DbSet<InheritanceDemo.TablePerConcreteType.TA> TAs { get; set; }
+
+        public DbSet<InheritanceDemo.TablePerType.Student> TPTStudents { get; set; }
+        public DbSet<InheritanceDemo.TablePerType.TA> TPTTAs { get; set; }
+
+        public DbSet<InheritanceDemo.TablePerType.User> TPTUsers { get; set; }
+        public DbSet<InheritanceDemo.TablePerType.Mentor> TPTMentors { get; set; }
+        public DbSet<InheritanceDemo.ComplexType.Student> CStudents { get; set; }
+        public DbSet<InheritanceDemo.ComplexType.TA> CTAs { get; set; }
+        public DbSet<InheritanceDemo.ComplexType.Mentor> CMentors { get; set; }
+
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
         {
@@ -20,31 +33,36 @@ namespace ProductService
             //modelBuilder.Entity<Category>().HasKey(c => c.id);
 
             base.OnModelCreating(modelBuilder);
-            //modelBuilder.ApplyConfiguration(new UserConfiguration());
+            
+            modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.UserConfiguration());
+            modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.TAConfiguration());
+            modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.MentorConfiguration());
+            modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.StudentConfiguration());
 
-            modelBuilder.Entity<User>()
-                .ToTable("tph_user")
-                .HasDiscriminator<string>("user_type")
-                .HasValue<TA>("ta")
-                .HasValue<Mentor>("mentor")
-                .HasValue<Student>("student");
 
-            modelBuilder.Entity<TA>()
-                .Property(e => e.averageRating)
-                .HasColumnName("average_rating");
+            modelBuilder.Entity<InheritanceDemo.ComplexType.TA>(e => e.OwnsOne(
+                ta => ta.user, user =>
+                {
+                    user.Property(u => u.name).HasColumnName("name");
+                    user.Property(u => u.email).HasColumnName("email");
+                }
+            ));
 
-            modelBuilder.Entity<Mentor>()
-                .Property(e => e.averageRating)
-                .HasColumnName("average_rating");
+            modelBuilder.Entity<InheritanceDemo.ComplexType.Student>(e => e.OwnsOne(
+                student => student.user, user =>
+                {
+                    user.Property(u => u.name).HasColumnName("name");
+                    user.Property(u => u.email).HasColumnName("email");
+                }
+            ));
 
-            modelBuilder.Entity<Student>()
-                .Property(e => e.psp)
-                .HasColumnName("psp");
-
-            modelBuilder.Entity<Student>()
-                .Property(e => e.attendance)
-                .HasColumnName("attendance");
-
+            modelBuilder.Entity<InheritanceDemo.ComplexType.Mentor>(e => e.OwnsOne(
+                mentor => mentor.user, user =>
+                {
+                    user.Property(u => u.name).HasColumnName("name");
+                    user.Property(u => u.email).HasColumnName("email");
+                }
+            ));
 
         }
     }
