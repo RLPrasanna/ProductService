@@ -8,6 +8,11 @@ namespace ProductService
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Price> Prices { get; set; }
+        public DbSet<Order> Orders { get; set; }
+
+        #region Inheritance strategies
+
         public DbSet<InheritanceDemo.TablePerHierarchy.User> TPHUsers { get; set; }
         public DbSet<InheritanceDemo.TablePerConcreteType.Mentor> TPCMentors { get; set; }
         public DbSet<InheritanceDemo.TablePerConcreteType.Student> TPCStudents { get; set; }
@@ -22,6 +27,7 @@ namespace ProductService
         public DbSet<InheritanceDemo.ComplexType.TA> CTAs { get; set; }
         public DbSet<InheritanceDemo.ComplexType.Mentor> CMentors { get; set; }
 
+        #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options):base(options)
         {
@@ -30,10 +36,35 @@ namespace ProductService
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Category>().HasKey(c => c.id);
+            // Configure relationships and mappings here
+
+            // One-to-One relationship between Product and Price
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.price)
+                .WithOne()
+                .HasForeignKey<Product>(p => p.priceId);
+
+            // Many-to-One relationship between Product and Category
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.category)
+                .WithMany(c => c.products)
+                .HasForeignKey(p => p.CategoryId);
+
+            // Many-to-One relationship between Product and Order
+            modelBuilder.Entity<OrderProduct>()
+                .HasKey(op => new { op.OrderId, op.ProductId });
+            modelBuilder.Entity<OrderProduct>()
+                .HasOne(o => o.Order)
+                .WithMany(op => op.OrderProducts);
+
+            //modelBuilder.Entity<OrderProduct>()
+            //    .HasOne(p => p.Product)
+            //    .WithMany(op => op.OrderProducts);
 
             base.OnModelCreating(modelBuilder);
-            
+
+            #region Inheritance strategies
+
             modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.UserConfiguration());
             modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.TAConfiguration());
             modelBuilder.ApplyConfiguration(new InheritanceDemo.TablePerHierarchy.Configuration.MentorConfiguration());
@@ -63,6 +94,8 @@ namespace ProductService
                     user.Property(u => u.email).HasColumnName("email");
                 }
             ));
+            #endregion
+
 
         }
     }
