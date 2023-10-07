@@ -8,7 +8,7 @@ using ProductService.ThirdPartyClients.FakeStore;
 
 namespace ProductService.Services
 {
-    public class FakeStoreProductService:IProductService
+    public class FakeStoreProductService: IFakeStoreProductService
     {
         private FakeStoryProductServiceClient fakeStoryProductServiceClient;
 
@@ -16,9 +16,9 @@ namespace ProductService.Services
         {
             this.fakeStoryProductServiceClient = fakeStoryProductServiceClient;
         }
-        private GenericProductDto MapToGenericProductDto(FakeStoreProductDto? fakeStoreProduct)
+        private FakeStoreGenericProductDto MapToFakeStoreGenericProductDto(FakeStoreProductDto? fakeStoreProduct)
         {
-            return new GenericProductDto()
+            return new FakeStoreGenericProductDto()
             {
                 id = fakeStoreProduct.id,
                 title = fakeStoreProduct.title,
@@ -29,33 +29,37 @@ namespace ProductService.Services
             };
         }
 
-        public async Task<GenericProductDto> getProductById(long id)
+        public async Task<FakeStoreGenericProductDto> getProductById(long id)
         {
             var fakeStoreProduct = await fakeStoryProductServiceClient.getProductById(id);
-            var product = MapToGenericProductDto(fakeStoreProduct);
+            var product = MapToFakeStoreGenericProductDto(fakeStoreProduct);
             return product;
         }
 
-        public async Task<GenericProductDto> createProduct(GenericProductDto product)
+        public async Task<FakeStoreGenericProductDto> createProduct(FakeStoreGenericProductDto product)
         {
-            return MapToGenericProductDto(await fakeStoryProductServiceClient.createProduct(product));
+            return MapToFakeStoreGenericProductDto(await fakeStoryProductServiceClient.createProduct(product));
         }
 
-        public async Task<List<GenericProductDto>> getAllProducts()
+        public async Task<List<FakeStoreGenericProductDto>> getAllProducts()
         {
-            List<GenericProductDto> genericProductDtos = new List<GenericProductDto>();
+            List<FakeStoreGenericProductDto> FakeStoreGenericProductDtos = new List<FakeStoreGenericProductDto>();
             var fakeStoreProduct =await fakeStoryProductServiceClient.getAllProducts();
             foreach (FakeStoreProductDto fakeStoreProductDto in fakeStoreProduct)
             {
-                genericProductDtos.Add(MapToGenericProductDto(fakeStoreProductDto));
+                FakeStoreGenericProductDtos.Add(MapToFakeStoreGenericProductDto(fakeStoreProductDto));
             }
-            return genericProductDtos;
+            return FakeStoreGenericProductDtos;
         }
 
-        public async Task<GenericProductDto> deleteProduct(long id)
+        public async Task<FakeStoreGenericProductDto> deleteProduct(long id)
         {
-            return MapToGenericProductDto(await fakeStoryProductServiceClient.deleteProduct(id));
+            return MapToFakeStoreGenericProductDto(await fakeStoryProductServiceClient.deleteProduct(id));
         }
 
+        public async Task<FakeStoreGenericProductDto> updateProduct(long id,FakeStoreGenericProductDto product)
+        {
+            return MapToFakeStoreGenericProductDto(await fakeStoryProductServiceClient.updateProduct(id,product));
+        }
     }
 }

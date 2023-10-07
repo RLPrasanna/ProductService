@@ -42,7 +42,7 @@ namespace ProductService.ThirdPartyClients.FakeStore
             return null;
         }
 
-        public async Task<FakeStoreProductDto> createProduct(GenericProductDto product)
+        public async Task<FakeStoreProductDto> createProduct(FakeStoreGenericProductDto product)
         {
             
             string jsonContent = JsonConvert.SerializeObject(product);
@@ -76,6 +76,16 @@ namespace ProductService.ThirdPartyClients.FakeStore
                 return deletedProduct;
             }
             return new FakeStoreProductDto();
+        }
+
+        public async Task<FakeStoreProductDto> updateProduct(long id,FakeStoreGenericProductDto product)
+        {
+            string jsonContent = JsonConvert.SerializeObject(product);
+            HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PutAsync($"{_productRequestsBaseUrl}/{id}", httpContent);
+            string content = await response.Content.ReadAsStringAsync();
+            FakeStoreProductDto updatedProduct = JsonConvert.DeserializeObject<FakeStoreProductDto>(content);
+            return updatedProduct;
         }
     }
 }
