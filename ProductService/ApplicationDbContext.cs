@@ -42,20 +42,23 @@ namespace ProductService
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.price)
                 .WithOne()
-                .HasForeignKey<Product>(p => p.priceId);
+                .HasForeignKey<Product>(p => p.priceId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Many-to-One relationship between Product and Category
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.category)
                 .WithMany(c => c.products)
-                .HasForeignKey(p => p.CategoryId);
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Many-to-One relationship between Product and Order
             modelBuilder.Entity<OrderProduct>()
                 .HasKey(op => new { op.OrderId, op.ProductId });
             modelBuilder.Entity<OrderProduct>()
                 .HasOne(o => o.Order)
-                .WithMany(op => op.OrderProducts);
+                .WithMany(op => op.OrderProducts)
+                .OnDelete(DeleteBehavior.Cascade);
 
             //modelBuilder.Entity<OrderProduct>()
             //    .HasOne(p => p.Product)

@@ -11,10 +11,10 @@ namespace ProductService.Repositories
             _context = context;
         }
 
-        public void Add(Category category)
+        public Category Add(Category category)
         {
-            _context.Categories.Add(category);
-            _context.SaveChanges();
+            return _context.Categories.Add(category).Entity;
+            //_context.SaveChanges();
         }
     }
 }

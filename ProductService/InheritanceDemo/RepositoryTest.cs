@@ -61,7 +61,7 @@ namespace ProductService.InheritanceDemo
                 var categoryRepository = scope.ServiceProvider.GetRequiredService<CategoryRepository>();
                 Category category = new Category();
                 category.name = "Apple Devices";
-                categoryRepository.Add(category);
+                category=categoryRepository.Add(category);
 
                 var priceRepository = scope.ServiceProvider.GetRequiredService<PriceRepository>();
                 Price price = new Price()
@@ -69,7 +69,7 @@ namespace ProductService.InheritanceDemo
                     price = 10,
                     currency = "Rupee"
                 };
-                priceRepository.Add(price);
+                price=priceRepository.Add(price);
 
                 var productRepository = scope.ServiceProvider.GetRequiredService<ProductRepository>();
                 Product product = new Product()
@@ -82,8 +82,8 @@ namespace ProductService.InheritanceDemo
                 };
                 productRepository.Add(product);
 
-                productRepository.DeleteById(Guid.Parse("FA2F1DD3-5456-413A-BA3E-902D069F888C"));
-
+                productRepository.DeleteById(Guid.Parse("B6627795-AE8E-44CC-954A-6006553D7367"));
+                var a=productRepository.FetchByTitle("iPhone 15 Pro");
             }
         }
     }

@@ -1,31 +1,46 @@
-﻿using ProductService.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ProductService.Models;
 
 namespace ProductService.Repositories
 {
-    public class ProductRepository
+    public class ProductRepository:Repository<Product>
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductRepository(ApplicationDbContext context)
+        public ProductRepository(ApplicationDbContext context):base(context)
         {
             _context = context;
         }
 
-        public void Add(Product product)
+        public override Product Add(Product product)
         {
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            var insertedProduct=base.Add(product);
+            Save();
+            return insertedProduct;
         }
 
         public void DeleteById(Guid id)
         {
-            var product=_context.Products.SingleOrDefault(p => p.Id ==id);
+            var product = GetById(id);
             if (product != null)
             {
-                _context.Products.Remove(product);
-                _context.SaveChanges();
+                product.category=_context.Categories.SingleOrDefault(c => c.Id == product.CategoryId);
+                product.price = _context.Prices.SingleOrDefault(p => p.Id == product.priceId);
+
+                Delete(product);
+                Save();
             }
             
         }
+
+        public List<Product> FetchByTitle(string title)
+        {
+            //using FromSqlInterpolated is safer choice than FromSqlRaw as they automatically parameterize the values
+            return _context.Products
+                .FromSqlInterpolated($"Select * from products p join OrderProduct op on p.id=op.ProductId where Title={title}")
+                .ToList();
+
+        }
+
     }
 }

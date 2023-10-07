@@ -11,10 +11,10 @@ namespace ProductService.Repositories
             _context = context;
         }
 
-        public void Add(Price price)
+        public Price Add(Price price)
         {
-            _context.Prices.Add(price);
-            _context.SaveChanges();
+            return _context.Prices.Add(price).Entity;
+            //_context.SaveChanges();
         }
     }
 }
