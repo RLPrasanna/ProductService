@@ -7,28 +7,28 @@ using ProductService.Services;
 
 namespace ProductService.Controllers
 {
-    [Route("api/v1/products")]
-    public class ProductController : Controller
+    [Route("api/v1/fakeStoreProducts")]
+    public class FakeStoreProductController : Controller
     {
-        private IProductService productService;
+        private IFakeStoreProductService productService;
 
-        public ProductController(IProductService productService)
+        public FakeStoreProductController(IFakeStoreProductService productService)
         {
             this.productService = productService;
         }
 
         [Route("")]
         [HttpGet]
-        public async Task<ActionResult<List<GenericProductDto>>> getAllProducts() 
+        public async Task<ActionResult<List<FakeStoreGenericProductDto>>> getAllProducts() 
         {
             var products= await productService.getAllProducts();
 
             return Ok(products);
         }
 
-        [Route("{id}")]
+        [Route("{id:long}")]
         [HttpGet]
-        public async Task<ActionResult<GenericProductDto>> getProductById(string id)
+        public async Task<ActionResult<FakeStoreGenericProductDto>> getProductById(long id)
         {
             try
             {
@@ -48,14 +48,14 @@ namespace ProductService.Controllers
 
         [Route("{id}")]
         [HttpDelete]
-        public async Task<ActionResult<GenericProductDto>> deleteProductById(string id)
+        public async Task<ActionResult<FakeStoreGenericProductDto>> deleteProductById(long id)
         {
             var product= await productService.deleteProduct(id);
             return Ok(product);
         }
 
         [HttpPost]
-        public async Task<ActionResult<GenericProductDto>> createProduct([FromBody] GenericProductDto product)
+        public async Task<ActionResult<FakeStoreGenericProductDto>> createProduct([FromBody] FakeStoreGenericProductDto product)
         {
             var createdProduct= await productService.createProduct(product);
             return CreatedAtAction(nameof(getProductById),new {id=createdProduct.id},createdProduct);
@@ -63,7 +63,7 @@ namespace ProductService.Controllers
 
         [Route("{id}")]
         [HttpPut]
-        public async Task<ActionResult<GenericProductDto>> updateProductById(string id, [FromBody] GenericProductDto product)
+        public async Task<ActionResult<FakeStoreGenericProductDto>> updateProductById(long id, [FromBody] FakeStoreGenericProductDto product)
         {
             if (id != product.id)
             {
@@ -73,20 +73,6 @@ namespace ProductService.Controllers
             var updatedProduct = await productService.updateProduct(id,product);
 
             return Ok(updatedProduct);
-        }
-
-        [Route("categories")]
-        [HttpGet]
-        public List<string> getAllCategories()
-        {
-            return productService.getAllCategories();
-        }
-
-        [Route("category/{categoryName}")]
-        [HttpGet]
-        public List<GenericProductDto> getByCategoryName(string categoryName)
-        {
-            return productService.getProductByCategoryName(categoryName);
         }
     }
 }

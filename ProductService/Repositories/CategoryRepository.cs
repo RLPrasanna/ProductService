@@ -2,19 +2,18 @@
 
 namespace ProductService.Repositories
 {
-    public class CategoryRepository
+    public class CategoryRepository:Repository<Category>
     {
         private readonly ApplicationDbContext _context;
 
-        public CategoryRepository(ApplicationDbContext context)
+        public CategoryRepository(ApplicationDbContext context):base(context)
         {
             _context = context;
         }
 
-        public Category Add(Category category)
+        public Category getByName(string name)
         {
-            return _context.Categories.Add(category).Entity;
-            //_context.SaveChanges();
+            return _context.Categories.FirstOrDefault(c => c.name == name);
         }
     }
 }

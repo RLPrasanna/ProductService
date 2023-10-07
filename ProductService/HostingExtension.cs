@@ -35,8 +35,8 @@ namespace ProductService
             builder.Services.AddHttpClient();
 
             // builder.Services
-            builder.Services.AddScoped<IProductService, FakeStoreProductService>();
-            builder.Services.AddTransient<ProductService.Services.ProductService>();
+            builder.Services.AddScoped<IProductService, Services.ProductService>();
+            builder.Services.AddScoped<IFakeStoreProductService, Services.FakeStoreProductService>();
             builder.Services.AddTransient<FakeStoryProductServiceClient>();
 
             // Repositories

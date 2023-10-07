@@ -2,19 +2,18 @@
 
 namespace ProductService.Repositories
 {
-    public class PriceRepository
+    public class PriceRepository:Repository<Price>
     {
         private readonly ApplicationDbContext _context;
 
-        public PriceRepository(ApplicationDbContext context)
+        public PriceRepository(ApplicationDbContext context):base(context)
         {
             _context = context;
         }
 
-        public Price Add(Price price)
+        public Price getByPrice(double? price)
         {
-            return _context.Prices.Add(price).Entity;
-            //_context.SaveChanges();
+            return _context.Prices.FirstOrDefault(p => p.price == price);
         }
     }
 }
