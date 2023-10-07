@@ -1,4 +1,7 @@
 ﻿using ProductService.InheritanceDemo.TablePerHierarchy;
+using ProductService.Models;
+using ProductService.Repositories;
+using System;
 
 namespace ProductService.InheritanceDemo
 {
@@ -14,11 +17,14 @@ namespace ProductService.InheritanceDemo
         {
             using (var scope = _serviceProvider.CreateScope())
             {
+                #region inheritance demo
+
+
                 var mentorRepository = scope.ServiceProvider.GetRequiredService<InheritanceDemo.TablePerHierarchy.MentorRepository>();
                 InheritanceDemo.TablePerHierarchy.Mentor mentor = new InheritanceDemo.TablePerHierarchy.Mentor();
-                mentor.name="Naman";
+                mentor.name = "Naman";
                 mentor.email = "Naman@scaler.com";
-                mentor.averageRating=4.65;
+                mentor.averageRating = 4.65;
                 mentorRepository.Add(mentor);
 
                 var userRepository = scope.ServiceProvider.GetRequiredService<InheritanceDemo.TablePerHierarchy.UserRepository>();
@@ -49,6 +55,35 @@ namespace ProductService.InheritanceDemo
                 mentor3.email = "Naman@scaler.com";
                 mentor3.averageRating = 4.65;
                 mentorRepository3.Add(mentor3);
+
+                #endregion
+
+                var categoryRepository = scope.ServiceProvider.GetRequiredService<CategoryRepository>();
+                Category category = new Category();
+                category.name = "Apple Devices";
+                category=categoryRepository.Add(category);
+
+                var priceRepository = scope.ServiceProvider.GetRequiredService<PriceRepository>();
+                Price price = new Price()
+                {
+                    price = 10,
+                    currency = "Rupee"
+                };
+                price=priceRepository.Add(price);
+
+                var productRepository = scope.ServiceProvider.GetRequiredService<ProductRepository>();
+                Product product = new Product()
+                {
+                    title = "iPhone 15 Pro",
+                    description = "The best iPhone Ever",
+                    image = "url",
+                    category = category,
+                    price = price
+                };
+                productRepository.Add(product);
+
+                productRepository.DeleteById(Guid.Parse("B6627795-AE8E-44CC-954A-6006553D7367"));
+                var a=productRepository.FetchByTitle("iPhone 15 Pro");
             }
         }
     }

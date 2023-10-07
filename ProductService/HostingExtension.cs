@@ -1,8 +1,7 @@
-﻿using System.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using ProductService.Exceptions;
 using ProductService.InheritanceDemo;
+using ProductService.Repositories;
 using ProductService.Services;
 using ProductService.ThirdPartyClients.FakeStore;
 
@@ -49,6 +48,9 @@ namespace ProductService
             builder.Services.AddScoped<ProductService.InheritanceDemo.TablePerType.StudentRepository>();
             builder.Services.AddScoped<ProductService.InheritanceDemo.ComplexType.MentorRepository>();
             builder.Services.AddScoped<ProductService.InheritanceDemo.ComplexType.StudentRepository>();
+            builder.Services.AddScoped<ProductRepository>();
+            builder.Services.AddScoped<CategoryRepository>();
+            builder.Services.AddScoped<PriceRepository>();
 
             // Database
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
