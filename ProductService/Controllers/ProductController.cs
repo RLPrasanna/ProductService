@@ -19,23 +19,36 @@ namespace ProductService.Controllers
 
         [Route("")]
         [HttpGet]
-        public async Task<ActionResult<List<GenericProductDto>>> getAllProducts() 
+        public async Task<ActionResult<List<GenericProductDto>>> GetAllProducts() 
         {
-            var products= await productService.getAllProducts();
+            List<GenericProductDto> productDtos = await productService.getAllProducts();
+            if (productDtos.Count == 0)
+            {
+                return NotFound(productDtos);
+            }
 
-            return Ok(products);
+            List<GenericProductDto> genericProductDtos = new List<GenericProductDto>(productDtos);
+            // You can remove the first item if needed
+            genericProductDtos.RemoveAt(0);
+
+            return Ok(genericProductDtos);
+            
         }
 
         [Route("{id}")]
         [HttpGet]
-        public async Task<ActionResult<GenericProductDto>> getProductById(string id)
+        public async Task<ActionResult<GenericProductDto>> GetProductById(string id)
         {
             try
             {
                 //To fetch individual service associated to Interface
                 //var productService2 = productService.GetRequiredService<IProductService>();
-                var product = await productService.getProductById(id);
-                return Ok(product);
+                GenericProductDto productDto = await productService.getProductById(id);
+                if (productDto == null)
+                {
+                    throw new NotFoundException("Product Doesn't Exist");
+                }
+                return Ok(productDto);
             }
             catch (NotFoundException ex)
             {
@@ -48,22 +61,22 @@ namespace ProductService.Controllers
 
         [Route("{id}")]
         [HttpDelete]
-        public async Task<ActionResult<GenericProductDto>> deleteProductById(string id)
+        public async Task<ActionResult<GenericProductDto>> DeleteProductById(string id)
         {
             var product= await productService.deleteProduct(id);
             return Ok(product);
         }
 
         [HttpPost]
-        public async Task<ActionResult<GenericProductDto>> createProduct([FromBody] GenericProductDto product)
+        public async Task<ActionResult<GenericProductDto>> CreateProduct([FromBody] GenericProductDto product)
         {
             var createdProduct= await productService.createProduct(product);
-            return CreatedAtAction(nameof(getProductById),new {id=createdProduct.id},createdProduct);
+            return CreatedAtAction(nameof(GetProductById),new {id=createdProduct.id},createdProduct);
         }
 
         [Route("{id}")]
         [HttpPut]
-        public async Task<ActionResult<GenericProductDto>> updateProductById(string id, [FromBody] GenericProductDto product)
+        public async Task<ActionResult<GenericProductDto>> UpdateProductById(string id, [FromBody] GenericProductDto product)
         {
             if (id != product.id)
             {
@@ -84,7 +97,7 @@ namespace ProductService.Controllers
 
         [Route("category/{categoryName}")]
         [HttpGet]
-        public List<GenericProductDto> getByCategoryName(string categoryName)
+        public List<GenericProductDto> GetByCategoryName(string categoryName)
         {
             return productService.getProductByCategoryName(categoryName);
         }
